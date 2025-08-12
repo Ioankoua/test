@@ -16,19 +16,21 @@ class ProductController {
         $this->productModel = new Product($this->db);
     }
 
-    public function index(): void {
-
-        $categories = $this->categoryModel->getAllWithCount();
-
+    private function getRequestParams(): array {
         $categoryId = isset($_GET['category_id']) && $_GET['category_id'] !== '' ? (int)$_GET['category_id'] : -1;
         $sort = $_GET['sort'] ?? 'price_asc';
+        return [$categoryId, $sort];
+    }
+
+    public function index(): void {
+        $categories = $this->categoryModel->getAllWithCount();
+        [$categoryId, $sort] = $this->getRequestParams();
 
         require __DIR__ . '/../Views/layout.php';
     }
 
     public function ajax(): void {
-        $categoryId = isset($_GET['category_id']) && $_GET['category_id'] !== '' ? (int)$_GET['category_id'] : -1;
-        $sort = $_GET['sort'] ?? 'price_asc';
+        [$categoryId, $sort] = $this->getRequestParams();
 
         $products = $this->productModel->getByCategory($categoryId, $sort);
 
